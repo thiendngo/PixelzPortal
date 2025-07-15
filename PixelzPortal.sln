@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelzPortal.Api", "src\PixelzPortal.Api\PixelzPortal.Api.csproj", "{85607848-8529-F837-27E3-40B8D67B188B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelzPortal.Application", "src\PixelzPortal.Application\PixelzPortal.Application.csproj", "{7D60F699-5749-0840-4BEB-D39EF327C34D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelzPortal.Domain", "src\PixelzPortal.Domain\PixelzPortal.Domain.csproj", "{7092878F-4405-570D-8D22-A85812AC103B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelzPortal.Infrastructure", "src\PixelzPortal.Infrastructure\PixelzPortal.Infrastructure.csproj", "{321B63BE-BFAE-9DF9-33D1-7E197A05E0F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelzPortal.Shared", "src\PixelzPortal.Shared\PixelzPortal.Shared.csproj", "{4ACED664-55B3-DACA-6C98-0D17FACCF46E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85607848-8529-F837-27E3-40B8D67B188B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85607848-8529-F837-27E3-40B8D67B188B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85607848-8529-F837-27E3-40B8D67B188B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85607848-8529-F837-27E3-40B8D67B188B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D60F699-5749-0840-4BEB-D39EF327C34D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D60F699-5749-0840-4BEB-D39EF327C34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D60F699-5749-0840-4BEB-D39EF327C34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D60F699-5749-0840-4BEB-D39EF327C34D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7092878F-4405-570D-8D22-A85812AC103B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7092878F-4405-570D-8D22-A85812AC103B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7092878F-4405-570D-8D22-A85812AC103B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7092878F-4405-570D-8D22-A85812AC103B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{321B63BE-BFAE-9DF9-33D1-7E197A05E0F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{321B63BE-BFAE-9DF9-33D1-7E197A05E0F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{321B63BE-BFAE-9DF9-33D1-7E197A05E0F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{321B63BE-BFAE-9DF9-33D1-7E197A05E0F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ACED664-55B3-DACA-6C98-0D17FACCF46E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ACED664-55B3-DACA-6C98-0D17FACCF46E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ACED664-55B3-DACA-6C98-0D17FACCF46E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ACED664-55B3-DACA-6C98-0D17FACCF46E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
