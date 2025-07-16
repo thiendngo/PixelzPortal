@@ -18,6 +18,8 @@ The system includes a .NET 8 backend following SOLID and CQRS principles, integr
 - Production failure queuing for manager resolution
 - RESTful API documentation via Swagger
 - Responsive Angular frontend with role-based UI rendering
+- Solution is splitted into multiple projects so team members can work on each service separately.
+- Data integrity can be achieved by implementing Unit-of-Work design pattern.
 
 ---
 
@@ -100,7 +102,10 @@ Controller logic is thin and delegates business logic to service classes.
 
 ### 2. Unit of Work Pattern
 
-- **Purpose:** Ensures atomic database changes  
+- **Purpose:** Wrapping all database changes in a single transaction, so either:
+  -	All changes commit together, or
+  -	Any failure causes a rollback of everything
+ 
 - **Used In:**  
   - `IUnitOfWork`, implemented in `UnitOfWork.cs`  
 - **Benefit:** All-or-nothing DB transactions (e.g., order + attachment + payment)  
