@@ -95,7 +95,11 @@ builder.Services.AddAuthentication(options =>
 });
 
 
-builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>(); 
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IProductionService, ProductionService>();
+builder.Services.AddScoped<IProductionQueueRepository, ProductionQueueRepository>();
+
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 builder.Services.AddScoped<IOrderPaymentKeyRepository, OrderPaymentKeyRepository>();

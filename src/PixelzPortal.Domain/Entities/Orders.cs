@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Domain.Entities
 {
-    public enum OrderStatus { Created, Processing, Paid, Failed }
+    public enum OrderStatus { Created, Processing, Paid, Failed, InProduction }
 
     public class Order
     {
@@ -29,6 +29,11 @@ namespace PixelzPortal.Domain.Entities
         public string Name { get; set; } = default!;
         public decimal TotalAmount { get; set; }
         public List<IFormFile>? Attachments { get; set; }
+    }
+    
+    public class UpdateOrderDto
+    {
+        public decimal TotalAmount { get; set; }
     }
 
 }

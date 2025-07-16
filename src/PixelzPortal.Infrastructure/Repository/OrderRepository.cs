@@ -24,6 +24,10 @@ namespace PixelzPortal.Infrastructure.Repository
         void SaveIdempotencyKey(OrderPaymentKey key);
         Task AddOrderAsync(Order order);
         Task AddInvoiceAsync(Invoice invoice);
+
+        Task QueueProductionFailureAsync(ProductionQueue queueItem);
+        Task<ProductionQueue?> GetActiveQueueByOrderIdAsync(Guid orderId);
+
     }
 
     // Step 2: Implement the Repository in Infrastructure
@@ -71,5 +75,17 @@ namespace PixelzPortal.Infrastructure.Repository
         }
 
         public Task SaveChangesAsync() => _context.SaveChangesAsync();
+
+        public async Task QueueProductionFailureAsync(ProductionQueue queueItem)
+        {
+            await _context.ProductionQueue.AddAsync(queueItem);
+        }
+
+        public async Task<ProductionQueue?> GetActiveQueueByOrderIdAsync(Guid orderId)
+        {
+            return await _context.ProductionQueue
+                .FirstOrDefaultAsync(q => q.OrderId == orderId && !q.IsResolved);
+        }
+
     }
 }

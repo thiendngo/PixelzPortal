@@ -19,6 +19,7 @@ namespace PixelzPortal.Infrastructure.Persistence
         public DbSet<Invoice> Invoices => Set<Invoice>();
         public DbSet<OrderAttachment> OrderAttachments => Set<OrderAttachment>();
         public DbSet<OrderPaymentKey> OrderPaymentKeys => Set<OrderPaymentKey>();
+        public DbSet<ProductionQueue> ProductionQueue => Set<ProductionQueue>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,6 +56,12 @@ namespace PixelzPortal.Infrastructure.Persistence
             builder.Entity<OrderPaymentKey>()
                 .HasIndex(p => new { p.OrderId, p.Key }) // Optional uniqueness
                 .IsUnique();
+
+            builder.Entity<ProductionQueue>()
+                .HasOne(q => q.Order)
+                .WithMany()
+                .HasForeignKey(q => q.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

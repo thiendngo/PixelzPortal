@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PixelzPortal.Application.Services;
@@ -20,20 +21,30 @@ namespace PixelzPortal.Api.Controllers
         private readonly IPaymentService _paymentService;
         private readonly IOrderPaymentKeyRepository _paymentKeys;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailService _email;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IProductionService _productionService;
 
         public OrderController(
             IOrderRepository orders,
             IAttachmentRepository attachments,
             IPaymentService paymentService,
             IOrderPaymentKeyRepository paymentKeys,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IEmailService email,
+            UserManager<AppUser> userManager,
+            IProductionService productionService)
         {
             _orders = orders;
             _attachments = attachments;
             _paymentService = paymentService;
             _paymentKeys = paymentKeys;
             _unitOfWork = unitOfWork;
+            _email = email;
+            _userManager = userManager;
+            _productionService = productionService;
         }
+
 
 
 
@@ -118,7 +129,7 @@ namespace PixelzPortal.Api.Controllers
         public async Task<IActionResult> UploadAttachments(Guid orderId, [FromForm] List<IFormFile> attachments)
         {
             if (attachments == null || attachments.Count == 0)
-                return BadRequest("No attachments uploaded.");
+                return Ok();
 
             var orderExists = await _orders.OrderExistsAsync(orderId);
             if (!orderExists)
@@ -147,6 +158,25 @@ namespace PixelzPortal.Api.Controllers
             await _orders.SaveChangesAsync();
             return Ok();
         }
+
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderDto dto)
+        {
+            var order = await _orders.GetOrderByIdAsync(id);
+            if (order == null)
+                return NotFound();
+
+            // Update fields
+            order.TotalAmount = dto.TotalAmount;
+
+            await _orders.SaveChangesAsync();
+            return NoContent();
+        }
+
+
+
 
         [HttpGet("{orderId}/attachments")]
         public async Task<IActionResult> GetAttachments(Guid orderId)
@@ -183,7 +213,8 @@ namespace PixelzPortal.Api.Controllers
                 return BadRequest("Missing Idempotency-Key header.");
 
             var order = await _orders.GetOrderByIdAsync(id);
-            if (order == null) return NotFound();
+            if (order == null)
+                return NotFound();
 
             bool keyExists = await _paymentKeys.IsKeyUsedAsync(id, idempotencyKey);
             if (keyExists)
@@ -193,21 +224,24 @@ namespace PixelzPortal.Api.Controllers
 
             try
             {
-                var usedKey = new OrderPaymentKey
+                // Record idempotency key
+                await _paymentKeys.AddAsync(new OrderPaymentKey
                 {
                     Id = Guid.NewGuid(),
                     OrderId = id,
                     Key = idempotencyKey,
                     CreatedAt = DateTime.UtcNow
-                };
-                await _paymentKeys.AddAsync(usedKey);
+                });
 
+                // Ensure order is valid for payment
                 if (order.Status != OrderStatus.Created && order.Status != OrderStatus.Failed)
                     return BadRequest("Order is already paid or being processed.");
 
+                // Mark order as processing
                 order.Status = OrderStatus.Processing;
                 await _orders.SaveChangesAsync();
 
+                // Process payment
                 var paymentResult = await _paymentService.ProcessPaymentAsync(order, order.UserId);
                 if (!paymentResult.IsSuccess)
                 {
@@ -217,20 +251,52 @@ namespace PixelzPortal.Api.Controllers
                     return BadRequest($"Payment failed: {paymentResult.ErrorMessage}");
                 }
 
-                var invoice = new Invoice
+                // Create invoice + mark as paid
+                await _orders.AddInvoiceAsync(new Invoice
                 {
                     Id = Guid.NewGuid(),
                     OrderId = order.Id,
                     Amount = order.TotalAmount,
                     CreatedAt = DateTime.UtcNow
-                };
+                });
 
-                await _orders.AddInvoiceAsync(invoice);
                 order.Status = OrderStatus.Paid;
                 await _orders.SaveChangesAsync();
 
+                // Attempt to push to production
+                var productionResult = await _productionService.PushOrderAsync(order);
+
+                if (!productionResult.Success)
+                {
+                    // Push failed → queue it for manager review
+                    await _orders.QueueProductionFailureAsync(new ProductionQueue
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderId = order.Id,
+                        Reason = productionResult.Error ?? "Unknown error"
+                    });
+
+                    await _unitOfWork.CommitAsync();
+                    return StatusCode(502, $"Payment succeeded but production failed. Order queued for manager review.");
+                }
+
+                // Success: mark order as InProduction
+                order.Status = OrderStatus.InProduction;
+                await _orders.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
-                return Ok(new { message = "Order checked out and pushed to production." });
+
+                // Email confirmation
+                var user = await _userManager.FindByIdAsync(order.UserId);
+                if (!string.IsNullOrWhiteSpace(user?.Email))
+                {
+                    await _email.SendOrderConfirmationAsync(
+                        email: user.Email,
+                        orderName: order.Name,
+                        amount: order.TotalAmount
+                    );
+                }
+
+                return Ok(new { message = "Order checked out and sent to production." });
             }
             catch (Exception ex)
             {
@@ -239,8 +305,56 @@ namespace PixelzPortal.Api.Controllers
             }
         }
 
+        [HttpPost("{id}/production")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> PushToProduction(Guid id)
+        {
+            var order = await _orders.GetOrderByIdAsync(id);
+            if (order == null)
+                return NotFound();
+
+            if (order.Status != OrderStatus.Paid)
+                return BadRequest("Only orders in Paid status can be pushed to production.");
+
+            var result = await _productionService.PushOrderAsync(order);
+
+            if (!result.Success)
+            {
+                // Optionally add to queue again if not already queued
+                var existingQueueItem = await _orders.GetActiveQueueByOrderIdAsync(order.Id);
+                if (existingQueueItem == null)
+                {
+                    await _orders.QueueProductionFailureAsync(new ProductionQueue
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderId = order.Id,
+                        Reason = result.Error ?? "Unknown failure",
+                        CreatedAt = DateTime.UtcNow,
+                        IsResolved = false
+                    });
+
+                    await _orders.SaveChangesAsync();
+                }
+
+                return StatusCode(502, $"Push failed: {result.Error}");
+            }
+
+            // ✅ Push succeeded → update order status
+            order.Status = OrderStatus.InProduction;
+            await _orders.SaveChangesAsync();
+
+            // ✅ Mark queue as resolved (if exists)
+            var queueItem = await _orders.GetActiveQueueByOrderIdAsync(order.Id);
+            if (queueItem != null)
+            {
+                queueItem.IsResolved = true;
+                queueItem.ResolvedAt = DateTime.UtcNow;
+                await _orders.SaveChangesAsync();
+            }
+
+            return Ok(new { message = "Order successfully pushed to production." });
+        }
 
 
     }
-
 }
