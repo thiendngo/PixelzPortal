@@ -26,15 +26,9 @@ namespace PixelzPortal.Infrastructure.Persistence
             }
 
             // Create users
-            var user = new AppUser { UserName = "user1@example.com", Email = "user1@example.com", EmailConfirmed = true };
             var it = new AppUser { UserName = "it@example.com", Email = "it@example.com", EmailConfirmed = true };
             var manager = new AppUser { UserName = "manager@example.com", Email = "manager@example.com", EmailConfirmed = true };
 
-            if (await userManager.FindByEmailAsync(user.Email) is null)
-            {
-                await userManager.CreateAsync(user, "User@123");
-                await userManager.AddToRoleAsync(user, "User");
-            }
 
             if (await userManager.FindByEmailAsync(it.Email) is null)
             {
@@ -49,27 +43,50 @@ namespace PixelzPortal.Infrastructure.Persistence
             }
 
             // Seed orders
+            // ===== SEED REGULAR USERS WITH ORDERS =====
+            var rnd = new Random();
+            var users = new List<AppUser>();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var email = $"user{i}@example.com";
+                var user = new AppUser { UserName = email, Email = email, EmailConfirmed = true };
+
+                if (await userManager.FindByEmailAsync(email) == null)
+                {
+                    await userManager.CreateAsync(user, "User@123");
+                    await userManager.AddToRoleAsync(user, "User");
+                    users.Add(user);
+                }
+                else
+                {
+                    users.Add(await userManager.FindByEmailAsync(email));
+                }
+            }
+
             if (!db.Orders.Any())
             {
-                db.Orders.AddRange(
-                    new Order
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Unpaid Order",
-                        TotalAmount = 100,
-                        Status = OrderStatus.Created,
-                        UserId = user.Id
-                    },
-                    new Order
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Paid Order",
-                        TotalAmount = 200,
-                        Status = OrderStatus.Paid,
-                        UserId = user.Id
-                    }
-                );
+                var orderList = new List<Order>();
 
+                foreach (var user in users)
+                {
+                    int orderCount = rnd.Next(3, 11); // Between 3 and 10
+                    for (int i = 0; i < orderCount; i++)
+                    {
+                        bool isPaid = rnd.NextDouble() < 0.2; // 20% chance
+                        orderList.Add(new Order
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = $"{user.UserName}-Order-{i + 1}",
+                            TotalAmount = rnd.Next(50, 300),
+                            Status = isPaid ? OrderStatus.Paid : OrderStatus.Created,
+                            UserId = user.Id,
+                            CreatedAt = DateTime.UtcNow.AddDays(-rnd.Next(1, 30))
+                        });
+                    }
+                }
+
+                db.Orders.AddRange(orderList);
                 await db.SaveChangesAsync();
             }
         }

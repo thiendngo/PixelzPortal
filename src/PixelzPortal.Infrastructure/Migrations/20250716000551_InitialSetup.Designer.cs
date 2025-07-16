@@ -12,7 +12,7 @@ using PixelzPortal.Infrastructure.Persistence;
 namespace PixelzPortal.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250715150345_InitialSetup")]
+    [Migration("20250716000551_InitialSetup")]
     partial class InitialSetup
     {
         /// <inheritdoc />
@@ -281,6 +281,61 @@ namespace PixelzPortal.Infrastructure.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("PixelzPortal.Domain.Entities.OrderAttachment", b =>
+                {
+                    b.Property<Guid>("AttachmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AttachmentId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderAttachments");
+                });
+
+            modelBuilder.Entity("PixelzPortal.Domain.Entities.OrderPaymentKey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId", "Key")
+                        .IsUnique();
+
+                    b.ToTable("OrderPaymentKeys");
+                });
+
             modelBuilder.Entity("PixelzPortal.Domain.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -365,6 +420,17 @@ namespace PixelzPortal.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("PixelzPortal.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("PixelzPortal.Domain.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("PixelzPortal.Domain.Entities.OrderAttachment", b =>
                 {
                     b.HasOne("PixelzPortal.Domain.Entities.Order", "Order")
                         .WithMany()

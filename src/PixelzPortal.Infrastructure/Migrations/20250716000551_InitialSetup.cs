@@ -51,6 +51,20 @@ namespace PixelzPortal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderPaymentKeys",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderPaymentKeys", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -194,6 +208,28 @@ namespace PixelzPortal.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderAttachments",
+                columns: table => new
+                {
+                    AttachmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Data = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderAttachments", x => x.AttachmentId);
+                    table.ForeignKey(
+                        name: "FK_OrderAttachments_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Payments",
                 columns: table => new
                 {
@@ -261,6 +297,17 @@ namespace PixelzPortal.Infrastructure.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderAttachments_OrderId",
+                table: "OrderAttachments",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderPaymentKeys_OrderId_Key",
+                table: "OrderPaymentKeys",
+                columns: new[] { "OrderId", "Key" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_Name",
                 table: "Orders",
                 column: "Name");
@@ -291,6 +338,12 @@ namespace PixelzPortal.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Invoices");
+
+            migrationBuilder.DropTable(
+                name: "OrderAttachments");
+
+            migrationBuilder.DropTable(
+                name: "OrderPaymentKeys");
 
             migrationBuilder.DropTable(
                 name: "Payments");

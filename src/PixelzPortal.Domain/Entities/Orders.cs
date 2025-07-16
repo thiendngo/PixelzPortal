@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,4 +22,13 @@ namespace PixelzPortal.Domain.Entities
         [Timestamp]
         public byte[] RowVersion { get; set; } = default!;
     }
+
+    public class CreateOrderDto
+    {
+        public string UserId { get; set; } = default!; // Target user
+        public string Name { get; set; } = default!;
+        public decimal TotalAmount { get; set; }
+        public List<IFormFile>? Attachments { get; set; }
+    }
+
 }
