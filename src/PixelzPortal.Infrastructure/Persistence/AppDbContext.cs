@@ -56,12 +56,6 @@ namespace PixelzPortal.Infrastructure.Persistence
             builder.Entity<OrderPaymentKey>()
                 .HasIndex(p => new { p.OrderId, p.Key }) // Optional uniqueness
                 .IsUnique();
-
-            builder.Entity<ProductionQueue>()
-                .HasOne(q => q.Order)
-                .WithMany()
-                .HasForeignKey(q => q.OrderId)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

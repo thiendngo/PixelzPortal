@@ -389,8 +389,6 @@ namespace PixelzPortal.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
-
                     b.ToTable("ProductionQueue");
                 });
 
@@ -473,17 +471,6 @@ namespace PixelzPortal.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("PixelzPortal.Domain.Entities.ProductionQueue", b =>
-                {
-                    b.HasOne("PixelzPortal.Domain.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");

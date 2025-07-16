@@ -12,7 +12,7 @@ using PixelzPortal.Infrastructure.Persistence;
 namespace PixelzPortal.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250716012120_InitialSetup")]
+    [Migration("20250716034000_InitialSetup")]
     partial class InitialSetup
     {
         /// <inheritdoc />
@@ -392,8 +392,6 @@ namespace PixelzPortal.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
-
                     b.ToTable("ProductionQueue");
                 });
 
@@ -476,17 +474,6 @@ namespace PixelzPortal.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("PixelzPortal.Domain.Entities.ProductionQueue", b =>
-                {
-                    b.HasOne("PixelzPortal.Domain.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");

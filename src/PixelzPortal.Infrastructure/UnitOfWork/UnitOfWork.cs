@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using PixelzPortal.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -34,12 +35,15 @@ namespace PixelzPortal.Infrastructure.UnitOfWork
 
         public async Task CommitAsync()
         {
+            await _dbContext.SaveChangesAsync();
+
             if (_transaction != null)
             {
                 await _transaction.CommitAsync();
                 await _transaction.DisposeAsync();
                 _transaction = null;
             }
+
         }
 
         public async Task RollbackAsync()

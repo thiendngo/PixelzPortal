@@ -26,7 +26,6 @@ namespace PixelzPortal.Infrastructure.Repository
         public async Task<List<ProductionQueue>> GetAllUnresolvedAsync()
         {
             return await _db.ProductionQueue
-                .Include(q => q.Order)
                 .Where(q => !q.IsResolved)
                 .OrderByDescending(q => q.CreatedAt)
                 .ToListAsync();

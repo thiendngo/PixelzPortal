@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PixelzPortal.Application.Services;
 using PixelzPortal.Domain.Entities;
+using PixelzPortal.Infrastructure.Messaging;
 using PixelzPortal.Infrastructure.Persistence;
 using PixelzPortal.Infrastructure.Repository;
 using PixelzPortal.Infrastructure.UnitOfWork;
@@ -98,12 +99,18 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IPaymentService, PaymentService>(); 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IProductionService, ProductionService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
 builder.Services.AddScoped<IProductionQueueRepository, ProductionQueueRepository>();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 builder.Services.AddScoped<IOrderPaymentKeyRepository, OrderPaymentKeyRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.Configure<KafkaSettings>(
+    builder.Configuration.GetSection("Kafka"));
+builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
 
 
 var app = builder.Build();

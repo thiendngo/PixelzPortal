@@ -25,7 +25,6 @@ namespace PixelzPortal.Api.Controllers
             {
                 q.Id,
                 q.OrderId,
-                OrderName = q.Order.Name,
                 q.Reason,
                 q.CreatedAt,
                 q.IsResolved
