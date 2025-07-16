@@ -35,11 +35,25 @@ dotnet ef database update --project src/PixelzPortal.Infrastructure --startup-pr
 ```
 - Check if the PixelzPortalDb database is created in SQL instance..
 
+### 2. Setup Kafka
+- Install Java JDK 12+
+- Download Kafka Scala binary (2.13) at https://kafka.apache.org/downloads
+- Extract the folder to C:\ (C:\Kafka)
+- Use PowerShell, navigate to C:\Kafka
+```
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+$env:KAFKA_HEAP_OPTS = "-Xmx1G -Xms1G"
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+```
+- This will setup Kafka.
+- Kafka is used in very minor feature to pop notification if an order is paid but failed to push to production (InProduction status)
+
 ### 3. Run the application
 - User list is seeded.
-
-- A few orders are added.
-
+- Users: User1@example.com : User1@123
+  - Similar with User2,3,4,5, etc.
+- ITSupport: it@example.com : it@123
+- Manager: manager@example.com : manager@123
 ---
 
-## A few issues:
