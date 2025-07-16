@@ -22,10 +22,13 @@ namespace PixelzPortal.Api.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IAttachmentService _attachmentService;
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService,
+            IAttachmentService attachmentService)
         {
             _orderService = orderService;
+            _attachmentService = attachmentService;
         }
 
         [HttpGet("my")]
@@ -123,6 +126,27 @@ namespace PixelzPortal.Api.Controllers
                 return BadRequest(result.Error);
 
             return Ok(new { message = "Order manually marked as paid." });
+        }
+
+        [HttpGet("{orderId}/attachments")]
+        public async Task<IActionResult> GetOrderAttachments(Guid orderId)
+        {
+
+            var order = await _orderService.GetOrderByIdAsync(orderId, User);
+            if (order == null)
+                return NotFound();
+
+            var attachments = await _attachmentService.GetAllAttachmentsByOrderIdAsync(orderId);
+
+            var result = attachments.Select(a => new
+            {
+                attachmentId = a.AttachmentId,
+                fileName = a.FileName,
+                fileType = a.FileType,
+                createdAt = a.CreatedAt
+            });
+
+            return Ok(result);
         }
 
     }

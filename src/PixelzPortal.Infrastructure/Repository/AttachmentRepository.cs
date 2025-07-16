@@ -15,6 +15,8 @@ namespace PixelzPortal.Infrastructure.Repository
         Task<OrderAttachment?> GetAttachmentByIdAsync(Guid attachmentId);
         void Add(OrderAttachment attachment);
         Task SaveChangesAsync();
+
+        void Remove(OrderAttachment attachment);
     }
     public class AttachmentRepository : IAttachmentRepository
     {
@@ -46,6 +48,11 @@ namespace PixelzPortal.Infrastructure.Repository
         public async Task SaveChangesAsync()
         {
             await _db.SaveChangesAsync();
+        }
+
+        public void Remove(OrderAttachment attachment)
+        {
+            _db.OrderAttachments.Remove(attachment);
         }
     }
 }
