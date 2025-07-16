@@ -27,6 +27,7 @@ namespace PixelzPortal.Infrastructure.Repository
 
         Task QueueProductionFailureAsync(ProductionQueue queueItem);
         Task<ProductionQueue?> GetActiveQueueByOrderIdAsync(Guid orderId);
+        Task AddPaymentAsync(Payment payment);
 
     }
 
@@ -85,6 +86,11 @@ namespace PixelzPortal.Infrastructure.Repository
         {
             return await _context.ProductionQueue
                 .FirstOrDefaultAsync(q => q.OrderId == orderId && !q.IsResolved);
+        }
+
+        public async Task AddPaymentAsync(Payment payment)
+        {
+            await _context.Payments.AddAsync(payment);
         }
 
     }

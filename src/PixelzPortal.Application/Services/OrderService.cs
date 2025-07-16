@@ -25,6 +25,8 @@ namespace PixelzPortal.Application.Services
         Task<(bool Success, string? Error)> CheckoutOrderAsync(Guid orderId, string idempotencyKey);
         Task<(bool Success, string? Error)> PushToProductionAsync(Guid orderId);
         Task TestQueueInsertAsync();
+        Task<(bool Success, string? Error)> MarkOrderAsPaidAsync(Guid orderId, string initiatedByUserId);
+
     }
 
     public class OrderService : IOrderService
@@ -272,6 +274,94 @@ namespace PixelzPortal.Application.Services
             };
             await _kafka.ProduceAsync("production-queue", kafkaMessage);
         }
+
+        public async Task<(bool Success, string? Error)> MarkOrderAsPaidAsync(Guid orderId, string initiatedByUserId)
+        {
+            var order = await _orders.GetOrderByIdAsync(orderId);
+            if (order == null)
+                return (false, "Order not found");
+
+            if (order.Status != OrderStatus.Created && order.Status != OrderStatus.Failed)
+                return (false, "Order must be in Created or Failed status to mark as Paid");
+
+            await _unitOfWork.BeginTransactionAsync();
+
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                Amount = order.TotalAmount,
+                CreatedAt = DateTime.UtcNow,
+                InitiatedByUserId = initiatedByUserId,
+                Method = PaymentMethod.WireTransfer,
+                Status = PaymentStatus.Success
+            };
+            await _orders.AddPaymentAsync(payment);
+
+            var invoice = new Invoice
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                Amount = order.TotalAmount,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _orders.AddInvoiceAsync(invoice);
+
+            order.Status = OrderStatus.Paid;
+            await _orders.SaveChangesAsync();
+
+            // Try push to production
+            var pushResult = await _productionService.PushOrderAsync(order);
+
+            if (!pushResult.Success)
+            {
+                await _orders.QueueProductionFailureAsync(new ProductionQueue
+                {
+                    Id = Guid.NewGuid(),
+                    OrderId = order.Id,
+                    Reason = pushResult.Error ?? "Unknown production failure",
+                    CreatedAt = DateTime.UtcNow,
+                    IsResolved = false
+                });
+
+                await _unitOfWork.CommitAsync();
+
+                await _kafka.ProduceAsync("production-queue", new
+                {
+                    orderId = order.Id,
+                    orderName = order.Name,
+                    createdAt = order.CreatedAt,
+                    userId = order.UserId,
+                    error = pushResult.Error,
+                    source = "MarkAsPaid"
+                });
+
+                return (false, "Marked as paid, but push to production failed.");
+            }
+
+            // Success → update status
+            order.Status = OrderStatus.InProduction;
+            await _orders.SaveChangesAsync();
+            await _unitOfWork.CommitAsync();
+
+            await _kafka.ProduceAsync("production-queue", new
+            {
+                orderId = order.Id,
+                orderName = order.Name,
+                createdAt = order.CreatedAt,
+                userId = order.UserId,
+                source = "MarkAsPaid"
+            });
+
+            var user = await _userManager.FindByIdAsync(order.UserId);
+            if (!string.IsNullOrWhiteSpace(user?.Email))
+            {
+                await _email.SendOrderConfirmationAsync(user.Email, order.Name, order.TotalAmount);
+            }
+
+            return (true, null);
+        }
+
 
     }
 }

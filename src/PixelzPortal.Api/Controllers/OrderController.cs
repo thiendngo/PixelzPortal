@@ -110,5 +110,20 @@ namespace PixelzPortal.Api.Controllers
             return Ok("Inserted and published.");
         }
 
+        [HttpPost("{id}/mark-paid")]
+        [Authorize(Roles = "ItSupport,Manager")]
+        public async Task<IActionResult> MarkAsPaid(Guid id)
+        {
+            var userId = User.FindFirstValue("userId");
+            if (userId == null) return Unauthorized();
+
+            var result = await _orderService.MarkOrderAsPaidAsync(id, userId);
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            return Ok(new { message = "Order manually marked as paid." });
+        }
+
     }
 }
