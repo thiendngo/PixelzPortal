@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Application.Services;
 using PixelzPortal.Domain.Entities;
 using PixelzPortal.Infrastructure.Messaging;
@@ -112,6 +113,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.Configure<KafkaSettings>(
     builder.Configuration.GetSection("Kafka"));
 builder.Services.AddSingleton<IKafkaProducer, KafkaProducer>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 
 var app = builder.Build();

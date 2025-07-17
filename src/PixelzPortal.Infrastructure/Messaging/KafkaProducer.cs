@@ -1,20 +1,11 @@
 ﻿using Confluent.Kafka;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using PixelzPortal.Application.Interfaces;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace PixelzPortal.Infrastructure.Messaging
 {
-    public interface IKafkaProducer
-    {
-        Task ProduceAsync<T>(string topic, T message);
-    }
-
+    
     public class KafkaProducer : IKafkaProducer
     {
         private readonly IProducer<Null, string> _producer;

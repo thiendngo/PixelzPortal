@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using PixelzPortal.Application.Services;
 using PixelzPortal.Domain.Entities;
+using PixelzPortal.Domain.Enums;
 using PixelzPortal.Infrastructure.Persistence;
+using PixelzPortal.Infrastructure.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +28,13 @@ namespace PixelzPortal.Tests.Services
                 .Options;
 
             _db = new AppDbContext(options);
+
+            var paymentRepository = new PaymentRepository(_db); // ✅ Correct type
             var loggerMock = new Mock<ILogger<PaymentService>>();
-            _service = new PaymentService(_db, loggerMock.Object);
+
+            _service = new PaymentService(paymentRepository, loggerMock.Object); // ✅ No longer passes _db
         }
+
 
         [TearDown]
         public void TearDown()

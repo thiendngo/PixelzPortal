@@ -1,34 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using PixelzPortal.Application.DTOs;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Domain.Entities;
-using PixelzPortal.Infrastructure.Messaging;
-using PixelzPortal.Infrastructure.Repository;
-using PixelzPortal.Infrastructure.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using PixelzPortal.Domain.Enums;
 using System.Security.Claims;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace PixelzPortal.Application.Services
 {
-    public interface IOrderService
-    {
-        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
-        Task<IEnumerable<Order>> GetAllOrdersAsync();
-        Task<Order> CreateOrderAsync(CreateOrderDto dto, string currentUserId, ClaimsPrincipal user);
-        Task UploadAttachmentsAsync(Guid orderId, List<IFormFile> attachments);
-        Task<Order?> GetOrderByIdAsync(Guid orderId, ClaimsPrincipal user);
-        Task UpdateOrderAmountAsync(Guid orderId, decimal totalAmount);
-        Task<(bool Success, string? Error)> CheckoutOrderAsync(Guid orderId, string idempotencyKey);
-        Task<(bool Success, string? Error)> PushToProductionAsync(Guid orderId);
-        Task TestQueueInsertAsync();
-        Task<(bool Success, string? Error)> MarkOrderAsPaidAsync(Guid orderId, string initiatedByUserId);
-
-    }
-
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orders;

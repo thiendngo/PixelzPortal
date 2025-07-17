@@ -1,25 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Domain.Entities;
-using PixelzPortal.Infrastructure.Persistence;
-using PixelzPortal.Infrastructure.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PixelzPortal.Application.Services
 {
-    public interface IAttachmentService
-    {
-        Task<OrderAttachment?> GetAttachmentAsync(Guid id);
-
-        Task<List<OrderAttachment>?> GetAllAttachmentsByOrderIdAsync(Guid orderId);
-
-        Task<object?> GetAttachmentMetadataAsync(Guid id);
-        Task<bool> DeleteAttachmentAsync(Guid id);
-    }
-
 
     public class AttachmentService : IAttachmentService
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PixelzPortal.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Domain.Entities
 {
-    public enum PaymentStatus { Pending, Success, Failed }
-    public enum PaymentMethod { CreditCard, WireTransfer, PayPal }
 
     public class Payment
     {

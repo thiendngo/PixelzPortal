@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using PixelzPortal.Application.Interfaces;
+using PixelzPortal.Application.Results;
 using PixelzPortal.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,19 +10,7 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Application.Services
 {
-    public interface IProductionService
-    {
-        Task<ProductionPushResult> PushOrderAsync(Order order);
-    }
 
-    public class ProductionPushResult
-    {
-        public bool Success { get; set; }
-        public string? Error { get; set; }
-
-        public static ProductionPushResult Ok() => new() { Success = true };
-        public static ProductionPushResult Fail(string reason) => new() { Success = false, Error = reason };
-    }
     public class ProductionService : IProductionService
     {
         private readonly ILogger<ProductionService> _logger;

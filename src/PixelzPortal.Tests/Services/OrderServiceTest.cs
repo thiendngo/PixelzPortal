@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Application.Services;
 using PixelzPortal.Domain.Entities;
+using PixelzPortal.Domain.Enums;
 using PixelzPortal.Infrastructure.Messaging;
 using PixelzPortal.Infrastructure.Persistence;
 using PixelzPortal.Infrastructure.Repository;

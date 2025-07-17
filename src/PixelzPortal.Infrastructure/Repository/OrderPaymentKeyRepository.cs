@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Domain.Entities;
 using PixelzPortal.Infrastructure.Persistence;
 using System;
@@ -9,13 +10,6 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Infrastructure.Repository
 {
-    public interface IOrderPaymentKeyRepository
-    {
-        Task<bool> IsKeyUsedAsync(Guid orderId, string key);
-        Task AddAsync(OrderPaymentKey key);
-        Task SaveChangesAsync();
-    }
-
     public class OrderPaymentKeyRepository : IOrderPaymentKeyRepository
     {
         private readonly AppDbContext _db;

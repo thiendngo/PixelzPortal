@@ -2,14 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PixelzPortal.Application.DTOs;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Application.Services;
-using PixelzPortal.Domain.Entities;
-using PixelzPortal.Infrastructure.Messaging;
-using PixelzPortal.Infrastructure.Persistence;
-using PixelzPortal.Infrastructure.Repository;
-using PixelzPortal.Infrastructure.UnitOfWork;
+
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace PixelzPortal.Api.Controllers
 {

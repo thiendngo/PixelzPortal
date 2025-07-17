@@ -1,4 +1,5 @@
 ﻿using PixelzPortal.Domain.Entities;
+using PixelzPortal.Domain.Enums;
 using PixelzPortal.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;

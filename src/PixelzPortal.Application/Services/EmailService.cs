@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PixelzPortal.Application.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,7 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Application.Services
 {
-    public interface IEmailService
-    {
-        Task SendOrderConfirmationAsync(string email, string orderName, decimal amount);
-    }
+
     public class EmailService : IEmailService
     {
         public async Task SendOrderConfirmationAsync(string email, string orderName, decimal amount)

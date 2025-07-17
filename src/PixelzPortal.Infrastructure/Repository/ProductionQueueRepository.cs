@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Domain.Entities;
 using PixelzPortal.Infrastructure.Persistence;
 using System;
@@ -9,11 +10,6 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Infrastructure.Repository
 {
-    public interface IProductionQueueRepository
-    {
-        Task<List<ProductionQueue>> GetAllUnresolvedAsync();
-    }
-
     public class ProductionQueueRepository : IProductionQueueRepository
     {
         private readonly AppDbContext _db;

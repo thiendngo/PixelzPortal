@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Domain.Entities;
 using PixelzPortal.Infrastructure.Persistence;
 using System;
@@ -9,15 +10,7 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Infrastructure.Repository
 {
-    public interface IAttachmentRepository
-    {
-        Task<List<OrderAttachment>> GetAttachmentsByOrderIdAsync(Guid orderId);
-        Task<OrderAttachment?> GetAttachmentByIdAsync(Guid attachmentId);
-        void Add(OrderAttachment attachment);
-        Task SaveChangesAsync();
-
-        void Remove(OrderAttachment attachment);
-    }
+    
     public class AttachmentRepository : IAttachmentRepository
     {
         private readonly AppDbContext _db;

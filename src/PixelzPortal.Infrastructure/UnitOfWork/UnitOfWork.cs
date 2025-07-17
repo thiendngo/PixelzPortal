@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,7 @@ using System.Threading.Tasks;
 
 namespace PixelzPortal.Infrastructure.UnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        Task BeginTransactionAsync();
-        Task CommitAsync();
-        Task RollbackAsync();
-        Task SaveChangesAsync();
-    }
+
 
     public class UnitOfWork : IUnitOfWork
     {
