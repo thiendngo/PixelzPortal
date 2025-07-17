@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PixelzPortal.Application.Interfaces;
 using PixelzPortal.Infrastructure.Repository;
 
 namespace PixelzPortal.Api.Controllers
