@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PixelzPortal.Application\PixelzPortal.Application.csproj" />
-    <ProjectReference Include="..\PixelzPortal.Domain\PixelzPortal.Domain.csproj" />
     <ProjectReference Include="..\PixelzPortal.Infrastructure\PixelzPortal.Infrastructure.csproj" />
     <ProjectReference Include="..\PixelzPortal.Shared\PixelzPortal.Shared.csproj" />
   </ItemGroup>
