@@ -198,6 +198,7 @@ namespace PixelzPortal.Application.Services
                     OrderId = order.Id,
                     Reason = prodResult.Error ?? "Unknown"
                 });
+                await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
                 await _kafka.ProduceAsync("production-queue", JsonSerializer.Serialize(new
                 {

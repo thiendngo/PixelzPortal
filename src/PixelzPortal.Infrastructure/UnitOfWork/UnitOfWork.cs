@@ -35,7 +35,6 @@ namespace PixelzPortal.Infrastructure.UnitOfWork
 
         public async Task CommitAsync()
         {
-            await _dbContext.SaveChangesAsync();
 
             if (_transaction != null)
             {
