@@ -4,7 +4,7 @@
 
 Pixelz Portal is a full-stack platform designed to help eCommerce studios manage their order workflow, payment processing, invoice creation, and order production integration.
 
-The system includes a .NET 8 backend following SOLID and CQRS principles, integrated with Kafka for production queue messaging, and an Angular 17 frontend for user interaction.
+The system includes a .NET 8 backend following SOLID and a few Design Pattern principles, integrated with Kafka for production queue messaging, and an Angular 20 frontend for user interaction.
 
 ---
 
