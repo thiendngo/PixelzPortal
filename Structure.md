@@ -1,51 +1,95 @@
-# ?? PixelzPortal Architecture Structure
+# PixelzPortal Architecture Structure
 
 This project follows **Onion Architecture**. Below is the folder and responsibility layout across layers.
 
 ---
 
-## ?? Project Structure
+##  Project Structure
 
 ```
-/PixelzPortal.Domain               # Core business entities and rules
-?
-??? Entities/                      # Order, Invoice, Payment, etc.
-??? Enums/                         # OrderStatus, PaymentMethod, etc.
-??? PixelzPortal.Domain.csproj
+src/
+│
+├── PixelzPortal.Api              # Presentation Layer
+│   ├── Controllers
+│   │   ├── AttachmentController.cs
+│   │   ├── AuthController.cs
+│   │   ├── OrderController.cs
+│   │   ├── ProductionQueueController.cs
+│   │   └── UserController.cs
+│   └── ...
+│
+├── PixelzPortal.Application      # Application Layer
+│   ├── DTOs
+│   │   ├── CreateOrderDto.cs
+│   │   └── UpdateOrderDto.cs
+│   ├── Interfaces
+│   │   ├── IAttachmentService.cs
+│   │   ├── IEmailService.cs
+│   │   ├── IOrderService.cs
+│   │   ├── IPaymentService.cs
+│   │   └── IProductionService.cs
+│   ├── Results
+│   │   ├── PaymentResult.cs
+│   │   └── ProductionPushResult.cs
+│   └── Services
+│       ├── AttachmentService.cs
+│       ├── EmailService.cs
+│       ├── OrderService.cs
+│       ├── PaymentService.cs
+│       └── ProductionService.cs
+│
+├── PixelzPortal.Domain           # Domain Layer
+│   ├── Entities
+│   │   ├── AppUser.cs
+│   │   ├── Invoices.cs
+│   │   ├── OrderAttachment.cs
+│   │   ├── OrderPaymentKey.cs
+│   │   ├── Orders.cs
+│   │   ├── Payments.cs
+│   │   └── ProductionQueue.cs
+│   ├── Enums
+│   │   ├── OrderStatus.cs
+│   │   ├── PaymentMethod.cs
+│   │   └── PaymentStatus.cs
+│   └── Interfaces
+│       ├── IAttachmentRepository.cs
+│       ├── IKafkaProducer.cs
+│       ├── IOrderPaymentKeyRepository.cs
+│       ├── IOrderRepository.cs
+│       ├── IPaymentRepository.cs
+│       ├── IProductionQueueRepository.cs
+│       └── IUnitOfWork.cs
+│
+├── PixelzPortal.Infrastructure   # Infrastructure Layer
+│   ├── Messaging
+│   │   └── KafkaProducer.cs
+│   ├── Persistence
+│   │   ├── AppDbContext.cs
+│   │   └── DbSeeder.cs
+│   ├── Repository
+│   │   ├── AttachmentRepository.cs
+│   │   ├── OrderPaymentKeyRepository.cs
+│   │   ├── OrderRepository.cs
+│   │   ├── PaymentRepository.cs
+│   │   └── ProductionQueueRepository.cs
+│   └── UnitOfWork
+│       └── UnitOfWork.cs
 
-/PixelzPortal.Application          # Application contracts and logic orchestration
-?
-??? DTOs/                          # CreateOrderDto, UpdateOrderDto, etc.
-??? Interfaces/                    # Repository & service interfaces (IOrderRepository, etc.)
-??? Results/                       # PaymentResult, ProductionPushResult, etc.
-??? PixelzPortal.Application.csproj
-
-/PixelzPortal.Infrastructure       # Implements application contracts
-?
-??? Messaging/                     # KafkaProducer, etc.
-??? Persistence/                   # AppDbContext, DbSeeder
-??? Repository/                    # OrderRepository, PaymentRepository, etc.
-??? Services/                      # PaymentService, EmailService, etc.
-??? UnitOfWork/                    # UnitOfWork class for transaction control
-??? PixelzPortal.Infrastructure.csproj
-
-/PixelzPortal.Api                  # Web API presentation layer
-?
-??? Controllers/                   # OrderController, AuthController, etc.
-??? Properties/
-??? appsettings.json
-??? Program.cs
-??? PixelzPortal.Api.csproj
 ```
 
 ---
 
-## ?? Dependency Flow
+## Dependency Flow
 
 ```
-[API] ? [Application] ? [Domain]
-   ?
-[Infrastructure (implements Application interfaces)]
+[PixelzPortal.Api (Presentation/WebApi)]
+            ↓
+[PixelzPortal.Application (Application Layer)]
+            ↓
+[PixelzPortal.Domain (Domain Layer)]
+            ↑
+[PixelzPortal.Infrastructure (Infrastructure Layer)]
+
 ```
 
 ---
