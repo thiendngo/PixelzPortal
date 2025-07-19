@@ -1,18 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PixelzPortal.Application.DTOs;
 using PixelzPortal.Application.Interfaces;
-using PixelzPortal.Application.Services;
-
 using System.Security.Claims;
 
 namespace PixelzPortal.Api.Controllers
 {
-
-
-
     [ApiController]
     [Authorize]
     [Route("api/orders")]

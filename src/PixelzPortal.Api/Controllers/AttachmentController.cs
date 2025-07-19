@@ -1,55 +1,40 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PixelzPortal.Infrastructure.Persistence;
+using PixelzPortal.Application.Interfaces;
 
 namespace PixelzPortal.Api.Controllers
 {
-
-
-
     [Route("api/[controller]")]
     [ApiController]
     public class AttachmentsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly IAttachmentService _attachmentService;
 
-        public AttachmentsController(AppDbContext context)
+        public AttachmentsController(IAttachmentService attachmentService)
         {
-            _db = context;
+            _attachmentService = attachmentService;
         }
 
         // GET: api/attachments/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMetadata(Guid id)
         {
-            var attachment = await _db.OrderAttachments
-                .Where(a => a.AttachmentId == id)
-                .Select(a => new
-                {
-                    a.AttachmentId,
-                    a.FileName,
-                    a.FileType,
-                    a.CreatedAt,
-                    a.OrderId
-                })
-                .FirstOrDefaultAsync();
-
-            if (attachment == null)
+            var metadata = await _attachmentService.GetAttachmentMetadataAsync(id);
+            if (metadata == null)
                 return NotFound();
 
-            return Ok(attachment);
+            return Ok(metadata);
         }
 
         // GET: api/attachments/{id}/download
         [HttpGet("{id}/download")]
         public async Task<IActionResult> Download(Guid id)
         {
-            var attachment = await _db.OrderAttachments.FindAsync(id);
-
+            var attachment = await _attachmentService.GetAttachmentAsync(id);
             if (attachment == null)
                 return NotFound();
 
+            // Assuming OrderAttachment has Data, FileType, FileName
             return File(attachment.Data, attachment.FileType, attachment.FileName);
         }
 
@@ -57,16 +42,12 @@ namespace PixelzPortal.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var attachment = await _db.OrderAttachments.FindAsync(id);
-
-            if (attachment == null)
+            var success = await _attachmentService.DeleteAttachmentAsync(id);
+            if (!success)
                 return NotFound();
-
-            _db.OrderAttachments.Remove(attachment);
-            await _db.SaveChangesAsync();
 
             return NoContent();
         }
     }
-    
+
 }
